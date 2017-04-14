@@ -24,8 +24,8 @@ namespace postit
         {
             if (!String.IsNullOrEmpty(richResults.Text))
             {
+                richPostresults.ResetText();
                 richPostresults.Text = PostRequest(richResults.Text);
-
                 string data = getBetween(richPostresults.Text, "\"UniqueTransId\":\"", "\"}}");
                 textBox1.Text = data;
                 lblMsg.Text = "Follow the prompts on your device...";
@@ -59,8 +59,7 @@ namespace postit
 
             using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
             {
-               // string json = "{\"Action\":\"Transaction\",\"LocationId\":\"YZM-5B5-RAC\",\"DeviceName\":\"S300-1234\",\"Data\":{ \"TransactionType\":\"CreditSale\",\"Amount\":\"18.00\",\"TransactionRef\":\"Receipt1234\",\"Cashier\":\"Jenny\",\"BillingName\":\"\",\"Street\":\"\",\"Zip\":\"\"}}";
-
+               
                 streamWriter.Write(myJson);
                 streamWriter.Flush();
                 streamWriter.Close();
@@ -106,6 +105,7 @@ namespace postit
         {
             if(!String.IsNullOrEmpty(textBox1.Text))
             {
+                richGetResults.ResetText();
                 GetRequest(textBox1.Text);
             }else
             {
@@ -118,21 +118,28 @@ namespace postit
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if(!string.IsNullOrEmpty(txtLocationId.Text) && !string.IsNullOrEmpty(txtDeviceName.Text) && !string.IsNullOrEmpty(txtAmount.Text) && !string.IsNullOrEmpty(txtRef.Text) && !string.IsNullOrEmpty(txtCashier.Text) && listBox1.SelectedIndex >= 0 )
+            if(!string.IsNullOrEmpty(txtLocationId.Text) && !string.IsNullOrEmpty(txtDeviceName.Text) && !string.IsNullOrEmpty(txtAmount.Text) && !string.IsNullOrEmpty(txtRef.Text) && listBox1.SelectedIndex >= 0 )
             {
+                richResults.ResetText();
                 CreateJson();
             }else
             {
                 MessageBox.Show("Please enter all required values and try again!", "Missing info", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
-            }
-           
-
+            }           
         }
         private void CreateJson()
         {
             string jsonStr;
-            jsonStr= "{\"Action\":\"Transaction\",\"LocationId\":\"" + txtLocationId.Text + "\",\"DeviceName\":\"" + txtDeviceName.Text + "\",\"Data\":{ \"TransactionType\":\"" + listBox1.SelectedItem + "\",\"Amount\":\"" + txtAmount.Text + "\",\"TransactionRef\":\"" + txtRef.Text + "\",\"Cashier\":\"" + txtCashier.Text + "\",\"BillingName\":\"" + txtBillingName.Text + "\",\"Street\":\"" + txtStreet.Text + "\",\"Zip\":\"" + txtZip.Text + "\"}}";
+            //Void requires UniqueTrnsId
+            if(listBox1.SelectedIndex==2)
+            {
+                jsonStr = "{\"Action\":\"Transaction\",\"LocationId\":\"" + txtLocationId.Text + "\",\"DeviceName\":\"" + txtDeviceName.Text + "\",\"Data\":{ \"TransactionType\":\"" + listBox1.SelectedItem + "\",\"TransactionRef\":\"" + txtRef.Text + "\",\"Cashier\":\"" + txtCashier.Text + "\",\"UniqueTransId\":\"" + textBox1.Text + "\",\"BillingName\":\"" + txtBillingName.Text + "\",\"Street\":\"" + txtStreet.Text + "\",\"Zip\":\"" + txtZip.Text + "\"}}";
+            }else
+            {
+                   jsonStr= "{\"Action\":\"Transaction\",\"LocationId\":\"" + txtLocationId.Text + "\",\"DeviceName\":\"" + txtDeviceName.Text + "\",\"Data\":{ \"TransactionType\":\"" + listBox1.SelectedItem + "\",\"Amount\":\"" + txtAmount.Text + "\",\"TransactionRef\":\"" + txtRef.Text + "\",\"Cashier\":\"" + txtCashier.Text + "\",\"BillingName\":\"" + txtBillingName.Text + "\",\"Street\":\"" + txtStreet.Text + "\",\"Zip\":\"" + txtZip.Text + "\"}}";
+            }
+         
             richResults.Text = jsonStr;
         }
 
@@ -172,6 +179,11 @@ namespace postit
             {
                 richGetResults.AppendText(s + Environment.NewLine);
             }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
